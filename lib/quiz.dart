@@ -30,7 +30,7 @@ class _QuizState extends State<Quiz> {
   /// Resets quiz to initial state
   void _restartQuiz() => setState(() {
     _selectedAnswers.clear();
-    _activeScreen = 'start-screen';
+    _activeScreen = 'questions-screen';
   });
 
   @override
