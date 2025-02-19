@@ -1,36 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:quiz_app/data/questions.dart';
-import 'package:quiz_app/questions_summary.dart';
+import 'package:quiz_app/questions_summary/questions_summary.dart';
 
+/// Screen displaying quiz results and restart option
 class ResultsScreen extends StatelessWidget {
-  const ResultsScreen({super.key, required this.chosenAnswers});
+  const ResultsScreen({
+    super.key,
+    required this.chosenAnswers,
+    required this.onRestart,
+  });
 
+  final VoidCallback onRestart;
   final List<String> chosenAnswers;
 
-  List<Map<String, Object>> getSummaryData() {
-    final List<Map<String, Object>> summary = [];
-
-    for (var i = 0; i < chosenAnswers.length; i++) {
-      summary.add({
-        'question_index': i,
-        'question': questions[i].question,
-        'correct_answer': questions[i].answers[0],
-        'chosen_answer': chosenAnswers[i],
-      });
-    }
-
-    return summary;
-  }
+  int get _totalQuestions => questions.length;
+  int get _correctAnswers =>
+      chosenAnswers
+          .where(
+            (answer) =>
+                answer == questions[chosenAnswers.indexOf(answer)].answers[0],
+          )
+          .length;
 
   @override
   Widget build(BuildContext context) {
-    final summaryData = getSummaryData();
-    final numberTotalQuestions = questions.length;
-    final numberCorrectAnswers =
-        summaryData.where((data) {
-          return data['correct_answer'] == data['chosen_answer'];
-        }).length;
-
     return SizedBox(
       width: double.infinity,
       child: Container(
@@ -39,15 +33,36 @@ class ResultsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'You answered $numberCorrectAnswers out of $numberTotalQuestions questions correctly!',
+              'You answered $_correctAnswers out of $_totalQuestions questions correctly!',
+              style: GoogleFonts.josefinSans(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromRGBO(202, 240, 248, 1),
+              ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            QuestionsSummary(summaryData),
+            QuestionsSummary(_createSummaryData()),
             const SizedBox(height: 30),
-            TextButton(onPressed: () {}, child: Text('Restart Quiz')),
+            TextButton.icon(
+              onPressed: onRestart,
+              style: TextButton.styleFrom(foregroundColor: Colors.black),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Restart Quiz!'),
+            ),
           ],
         ),
       ),
     );
   }
+
+  List<Map<String, Object>> _createSummaryData() => List.generate(
+    chosenAnswers.length,
+    (index) => {
+      'question_index': index,
+      'question': questions[index].question,
+      'correct_answer': questions[index].answers[0],
+      'chosen_answer': chosenAnswers[index],
+    },
+  );
 }

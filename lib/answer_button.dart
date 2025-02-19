@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Custom styled button for quiz answers
 class AnswerButton extends StatelessWidget {
   const AnswerButton(this.answerText, this.onPressed, {super.key});
 
